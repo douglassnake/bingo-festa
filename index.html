@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
     body { font-family: Arial; text-align: center; margin-top: 50px; }
-    button { font-size: 32px; padding: 20px 40px; }
+    button { font-size: 32px; padding: 20px 40px; margin: 10px; }
     #numero { font-size: 100px; margin: 30px; color: #2ecc71; }
     #qrcode { margin-top: 20px; }
   </style>
@@ -17,6 +17,7 @@
   <h1>Bingo Niver do José</h1>
   <div id="numero">---</div>
   <button onclick="sortear()">Sortear Número</button>
+  <button onclick="resetar()">Resetar Sorteio</button>
   <div id="qrcode"></div>
 
 <script>
@@ -34,7 +35,7 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const numeros = Array.from({length: 75}, (_, i) => i + 1);
+  let numeros = Array.from({length: 75}, (_, i) => i + 1);
 
   function sortear() {
     if (numeros.length === 0) {
@@ -46,10 +47,16 @@
     document.getElementById('numero').innerText = numero;
 
     db.ref('sorteio_atual').set({ numero });
-db.ref('historico').push(numero);
+    db.ref('historico').push(numero);
   }
 
-  // Gera o QR code fixo ao carregar a página
+  function resetar() {
+    numeros = Array.from({length: 75}, (_, i) => i + 1);
+    document.getElementById('numero').innerText = '---';
+    db.ref('sorteio_atual').set({ numero: null });
+    db.ref('historico').remove();
+  }
+
   window.onload = function() {
     const url = location.href.replace(/\/[^\/]*$/, '/painel.html');
     QRCode.toCanvas(document.createElement('canvas'), url, function (error, canvas) {
