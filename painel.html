@@ -2,46 +2,29 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Bingo Niver do José - Painel</title>
+  <title>Bingo - Painel</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
-    body { 
-      font-family: Arial; 
-      text-align: center; 
-      margin-top: 50px; 
-      background: #f9f9f9; 
-    }
-    h1 { font-size: 36px; margin-bottom: 40px; }
-    #numero { 
-      font-size: 120px; 
-      color: #2ecc71; 
-      margin-top: 50px;
-    }
-    #historico { 
-      margin-top: 40px; 
-    }
-    .bolinha {
-      display: inline-block;
-      margin: 5px;
-      padding: 15px;
-      border-radius: 50%;
-      background: #ecf0f1;
-      border: 2px solid #ccc;
-      font-size: 24px;
-      width: 60px;
-      height: 60px;
-      line-height: 30px;
-    }
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    #numero { font-size: 100px; margin: 30px; color: #2ecc71; }
+    .painel-bingo { display: flex; justify-content: center; margin-top: 30px; }
+    .coluna { margin: 0 10px; }
+    .coluna h2 { font-size: 32px; margin-bottom: 10px; }
+    .numero-sorteado { display: block; margin: 5px; padding: 5px; background: #ecf0f1; border-radius: 5px; width: 40px; }
   </style>
 </head>
 <body>
+  <h1>Bingo Niver do José - Painel</h1>
+  <div id="numero">Aguardando sorteio...</div>
 
-<h1>Bingo Niver do José - Painel</h1>
-<div id="numero">Aguardando sorteio...</div>
-
-<h2>Números Sorteados:</h2>
-<div id="historico"></div>
+  <div class="painel-bingo">
+    <div class="coluna" id="coluna-B"><h2>B</h2></div>
+    <div class="coluna" id="coluna-I"><h2>I</h2></div>
+    <div class="coluna" id="coluna-N"><h2>N</h2></div>
+    <div class="coluna" id="coluna-G"><h2>G</h2></div>
+    <div class="coluna" id="coluna-O"><h2>O</h2></div>
+  </div>
 
 <script>
   const firebaseConfig = {
@@ -58,33 +41,31 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const numeroEl = document.getElementById('numero');
-  const historicoEl = document.getElementById('historico');
-
-  // Atualiza o número atual
-  db.ref('sorteio_atual').on('value', (snapshot) => {
+  db.ref('sorteio_atual').on('value', snapshot => {
     const data = snapshot.val();
-    if (data && data.numero) {
-      numeroEl.textContent = data.numero;
-    } else {
-      numeroEl.textContent = 'Aguardando sorteio...';
-    }
+    document.getElementById('numero').innerText = data && data.numero ? data.numero : 'Aguardando sorteio...';
   });
 
-  // Atualiza o histórico
-  db.ref('historico').on('value', (snapshot) => {
-    const data = snapshot.val();
-    historicoEl.innerHTML = '';
+  db.ref('historico').on('value', snapshot => {
+    const historico = snapshot.val();
+    const colunas = { B: [], I: [], N: [], G: [], O: [] };
 
-    if (data) {
-      const numeros = Object.values(data);
-      numeros.forEach(num => {
-        const span = document.createElement('span');
-        span.textContent = num;
-        span.className = 'bolinha';
-        historicoEl.appendChild(span);
+    if (historico) {
+      Object.values(historico).forEach(numero => {
+        let letra = '';
+        if (numero <= 15) letra = 'B';
+        else if (numero <= 30) letra = 'I';
+        else if (numero <= 45) letra = 'N';
+        else if (numero <= 60) letra = 'G';
+        else letra = 'O';
+        colunas[letra].push(numero);
       });
     }
+
+    ['B', 'I', 'N', 'G', 'O'].forEach(letra => {
+      const coluna = document.getElementById('coluna-' + letra);
+      coluna.innerHTML = '<h2>' + letra + '</h2>' + colunas[letra].map(num => '<span class="numero-sorteado">' + num + '</span>').join('');
+    });
   });
 </script>
 
