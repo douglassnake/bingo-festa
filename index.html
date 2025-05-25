@@ -1,62 +1,59 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Sorteador - Niver do José</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <title>Bingo - Sorteador</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    button { font-size: 32px; padding: 20px 40px; }
+    #numero { font-size: 100px; margin: 30px; color: #2ecc71; }
+    #qrcode { margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Sorteador - Niver do José</h1>
+  <h1>Bingo Niver do José</h1>
+  <div id="numero">---</div>
   <button onclick="sortear()">Sortear Número</button>
-  <h2 id="resultado"></h2>
-  <img id="qrcode" alt="QR Code do painel" />
+  <div id="qrcode"></div>
 
 <script>
-  // Configuração do Firebase
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVoKNJfK5PS7IVmk69I9CDWhlcNajyMD8",
+    authDomain: "bingoniverjose.firebaseapp.com",
+    databaseURL: "https://bingoniverjose-default-rtdb.firebaseio.com",
+    projectId: "bingoniverjose",
+    storageBucket: "bingoniverjose.firebasestorage.app",
+    messagingSenderId: "50831592649",
+    appId: "1:50831592649:web:bb4ea795d53b4a7bc95118",
+    measurementId: "G-9KYM2CJBHV"
+  };
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDVoKNJfK5PS7IVmk69I9CDWhlcNajyMD8",
-  authDomain: "bingoniverjose.firebaseapp.com",
-  projectId: "bingoniverjose",
-  storageBucket: "bingoniverjose.firebasestorage.app",
-  messagingSenderId: "50831592649",
-  appId: "1:50831592649:web:bb4ea795d53b4a7bc95118",
-  measurementId: "G-9KYM2CJBHV"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  let numeros = Array.from({length: 75}, (_, i) => i + 1);
+  const numeros = Array.from({length: 75}, (_, i) => i + 1);
 
   function sortear() {
-    if(numeros.length === 0) {
-      document.getElementById('resultado').innerText = 'Fim do sorteio';
+    if (numeros.length === 0) {
+      alert("Todos os números foram sorteados!");
       return;
     }
     const idx = Math.floor(Math.random() * numeros.length);
     const numero = numeros.splice(idx, 1)[0];
-    document.getElementById('resultado').innerText = numero;
+    document.getElementById('numero').innerText = numero;
 
-    // Salva no Firebase
-    db.ref('bingo').set({ numero: numero });
+    db.ref('sorteio_atual').set({ numero });
 
-    // Gera QR
-    const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(window.location.origin + '/bingo-festa/painel.html');
-    document.getElementById('qrcode').src = qr;
+    const url = location.href.replace('sorteador', 'painel') + `?r=${Math.random()}`;
+    document.getElementById('qrcode').innerHTML = '';
+    QRCode.toCanvas(document.createElement('canvas'), url, function (error, canvas) {
+      if (!error) document.getElementById('qrcode').appendChild(canvas);
+    });
   }
 </script>
+
 </body>
 </html>
