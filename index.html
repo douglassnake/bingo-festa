@@ -50,7 +50,7 @@
 
   // Gera o QR code fixo ao carregar a página
   window.onload = function() {
-    const url = location.href.replace('index.html', 'painel.html');
+    const url = location.href.replace(/\/[^\/]*$/, '/painel.html');
     QRCode.toCanvas(document.createElement('canvas'), url, function (error, canvas) {
       if (!error) document.getElementById('qrcode').appendChild(canvas);
     });
