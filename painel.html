@@ -2,16 +2,16 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Painel do Bingo</title>
+  <title>Bingo - Painel</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
     body { font-family: Arial; text-align: center; margin-top: 50px; }
-    #numero { font-size: 120px; margin: 30px; color: #2ecc71; }
+    #numero { font-size: 100px; margin: 30px; color: #2ecc71; }
   </style>
 </head>
 <body>
-  <h1>Painel - Niver do José</h1>
+  <h1>Bingo Niver do José - Painel</h1>
   <div id="numero">Aguardando sorteio...</div>
 
 <script>
@@ -31,10 +31,11 @@
 
   db.ref('sorteio_atual').on('value', snapshot => {
     const data = snapshot.val();
-    if (data && data.numero !== undefined) {
-      document.getElementById('numero').innerText = data.numero;
+    const numeroDiv = document.getElementById('numero');
+    if (data && data.numero) {
+      numeroDiv.innerText = data.numero;
     } else {
-      document.getElementById('numero').innerText = 'Aguardando sorteio...';
+      numeroDiv.innerText = 'Aguardando sorteio...';
     }
   });
 </script>
