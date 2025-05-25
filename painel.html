@@ -2,17 +2,33 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Bingo - Painel</title>
+  <title>Bingo Niver do José - Painel</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 50px; }
-    #numero { font-size: 100px; margin: 30px; color: #2ecc71; }
+    body { 
+      font-family: Arial; 
+      text-align: center; 
+      margin-top: 50px; 
+      background: #f9f9f9; 
+    }
+    h1 { font-size: 36px; margin-bottom: 40px; }
+    #numero { 
+      font-size: 120px; 
+      color: #2ecc71; 
+      margin-top: 50px;
+    }
+    #status { 
+      font-size: 50px; 
+      color: #27ae60; 
+    }
   </style>
 </head>
 <body>
-  <h1>Bingo Niver do José - Painel</h1>
-  <div id="numero">Aguardando sorteio...</div>
+
+<h1>Bingo Niver do José - Painel</h1>
+<div id="status">Aguardando sorteio...</div>
+<div id="numero"></div>
 
 <script>
   const firebaseConfig = {
@@ -29,13 +45,17 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+  const statusEl = document.getElementById('status');
+  const numeroEl = document.getElementById('numero');
+
   db.ref('sorteio_atual').on('value', snapshot => {
     const data = snapshot.val();
-    const numeroDiv = document.getElementById('numero');
     if (data && data.numero) {
-      numeroDiv.innerText = data.numero;
+      statusEl.style.display = 'none';
+      numeroEl.textContent = data.numero;
     } else {
-      numeroDiv.innerText = 'Aguardando sorteio...';
+      statusEl.style.display = 'block';
+      numeroEl.textContent = '';
     }
   });
 </script>
