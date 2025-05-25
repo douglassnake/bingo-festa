@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorteador - Niver do José</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f9f9f9; padding: 20px; }
+    #numero { font-size: 120px; margin: 20px; background: #2ecc71; color: black; border-radius: 50%; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
+    button { padding: 16px 28px; font-size: 20px; background: green; color: white; border: none; border-radius: 10px; margin: 20px; }
+    #qrcode { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Sorteador - Niver do José</h1>
+  <button onclick="sortear()">Sortear</button>
+  <div id="numero">---</div>
+  <div id="qrcode"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <script>
+    const numeros = Array.from({length: 75}, (_, i) => i + 1);
+    const urlPainel = 'https://douglassnake.github.io/bingo/painel.html';
+
+    function sortear() {
+      if (numeros.length === 0) {
+        alert("Todos sorteados!");
+        return;
+      }
+      const index = Math.floor(Math.random() * numeros.length);
+      const num = numeros.splice(index, 1)[0];
+      document.getElementById("numero").innerText = num;
+
+      localStorage.setItem('bingo_numero', num);
+      gerarQR(urlPainel);
+    }
+
+    function gerarQR(url) {
+      QRCode.toDataURL(url, function (err, qrUrl) {
+        if (err) console.error(err);
+        document.getElementById('qrcode').innerHTML = '<img src="' + qrUrl + '" alt="QR Code">';
+      });
+    }
+  </script>
+</body>
+</html>
