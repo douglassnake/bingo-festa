@@ -4,22 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel - Niver do José</title>
-  <style>
-    body { font-family: Arial; text-align: center; background: #f9f9f9; padding: 20px; }
-    #numero { font-size: 120px; margin-top: 50px; background: #2ecc71; color: black; border-radius: 50%; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
-  </style>
 </head>
 <body>
   <h1>Painel - Niver do José</h1>
-  <div id="numero">---</div>
-
-  <script>
-    function atualizar() {
-      const num = localStorage.getItem('bingo_numero') || "---";
-      document.getElementById('numero').innerText = num;
+  <h2 id="numero">Aguardando sorteio...</h2>
+<script>
+  function atualizarPainel() {
+    const dado = localStorage.getItem('sorteio_atual');
+    if (dado) {
+      const { numero } = JSON.parse(dado);
+      document.getElementById('numero').innerText = 'Último número: ' + numero;
     }
-    setInterval(atualizar, 1000);
-    atualizar();
-  </script>
+  }
+  setInterval(atualizarPainel, 1000);
+</script>
 </body>
 </html>
