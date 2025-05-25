@@ -46,6 +46,7 @@
     document.getElementById('numero').innerText = numero;
 
     db.ref('sorteio_atual').set({ numero });
+db.ref('historico').push(numero);
   }
 
   // Gera o QR code fixo ao carregar a página

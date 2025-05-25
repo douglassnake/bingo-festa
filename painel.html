@@ -18,17 +18,30 @@
       color: #2ecc71; 
       margin-top: 50px;
     }
-    #status { 
-      font-size: 50px; 
-      color: #27ae60; 
+    #historico { 
+      margin-top: 40px; 
+    }
+    .bolinha {
+      display: inline-block;
+      margin: 5px;
+      padding: 15px;
+      border-radius: 50%;
+      background: #ecf0f1;
+      border: 2px solid #ccc;
+      font-size: 24px;
+      width: 60px;
+      height: 60px;
+      line-height: 30px;
     }
   </style>
 </head>
 <body>
 
 <h1>Bingo Niver do José - Painel</h1>
-<div id="status">Aguardando sorteio...</div>
-<div id="numero"></div>
+<div id="numero">Aguardando sorteio...</div>
+
+<h2>Números Sorteados:</h2>
+<div id="historico"></div>
 
 <script>
   const firebaseConfig = {
@@ -45,17 +58,32 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const statusEl = document.getElementById('status');
   const numeroEl = document.getElementById('numero');
+  const historicoEl = document.getElementById('historico');
 
-  db.ref('sorteio_atual').on('value', snapshot => {
+  // Atualiza o número atual
+  db.ref('sorteio_atual').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data && data.numero) {
-      statusEl.style.display = 'none';
       numeroEl.textContent = data.numero;
     } else {
-      statusEl.style.display = 'block';
-      numeroEl.textContent = '';
+      numeroEl.textContent = 'Aguardando sorteio...';
+    }
+  });
+
+  // Atualiza o histórico
+  db.ref('historico').on('value', (snapshot) => {
+    const data = snapshot.val();
+    historicoEl.innerHTML = '';
+
+    if (data) {
+      const numeros = Object.values(data);
+      numeros.forEach(num => {
+        const span = document.createElement('span');
+        span.textContent = num;
+        span.className = 'bolinha';
+        historicoEl.appendChild(span);
+      });
     }
   });
 </script>
