@@ -3,18 +3,15 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Sorteador - Niver do José</title>
+  <title>Painel - Niver do José</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
-  <h1>Sorteador - Niver do José</h1>
-  <button onclick="sortear()">Sortear Número</button>
-  <h2 id="resultado"></h2>
-  <img id="qrcode" alt="QR Code do painel" />
+  <h1>Painel - Niver do José</h1>
+  <h2 id="numero">Aguardando sorteio...</h2>
 
 <script>
-  // Configuração do Firebase
   // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -39,24 +36,12 @@ const analytics = getAnalytics(app);
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  let numeros = Array.from({length: 75}, (_, i) => i + 1);
-
-  function sortear() {
-    if(numeros.length === 0) {
-      document.getElementById('resultado').innerText = 'Fim do sorteio';
-      return;
+  db.ref('bingo').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById('numero').innerText = 'Último número: ' + data.numero;
     }
-    const idx = Math.floor(Math.random() * numeros.length);
-    const numero = numeros.splice(idx, 1)[0];
-    document.getElementById('resultado').innerText = numero;
-
-    // Salva no Firebase
-    db.ref('bingo').set({ numero: numero });
-
-    // Gera QR
-    const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(window.location.origin + '/bingo-festa/painel.html');
-    document.getElementById('qrcode').src = qr;
-  }
+  });
 </script>
 </body>
 </html>
