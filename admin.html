@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Gestão Protegido</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    header {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #1a73e8;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+    .pago-btn { background: #4CAF50; }
+    .cancelar-btn { background: #F44336; }
+
+    /* Modal de senha */
+    .auth-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .auth-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 300px;
+      width: 90%;
+    }
+    .auth-box input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .auth-box button {
+      padding: 8px 12px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .erro {
+      color: red;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 Painel de Gestão - Rifa</h1>
+  </header>
+
+  <!-- Modal de senha -->
+  <div id="auth-modal" class="auth-modal">
+    <div class="auth-box">
+      <h2>🔐 Acesso Restrito</h2>
+      <input type="password" id="senha" placeholder="Digite a senha" />
+      <button onclick="verificarSenha()">Entrar</button>
+      <p id="mensagem-erro" class="erro"></p>
+    </div>
+  </div>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-corpo"></tbody>
+    </table>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Configuração Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmIKqT6FKAlOJXvBMop89kATekUsy4yR0",
+      authDomain: "rifa-stanley.firebaseapp.com",
+      projectId: "rifa-stanley",
+      storageBucket: "rifa-stanley.appspot.com",
+      messagingSenderId: "811838072733",
+      appId: "1:811838072733:web:c380ce75a40d1b90ca3174",
+      measurementId: "G-L9C0JX7ZNJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Senha de acesso
+    const senhaCorreta = "aDmin@2025";
+    function verificarSenha() {
+      const senha = document.getElementById('senha').value;
+      if (senha === senhaCorreta) {
+        document.getElementById('auth-modal').style.display = 'none';
+      } else {
+        const erro = document.getElementById('mensagem-erro');
+        erro.textContent = "Senha incorreta.";
+        erro.style.display = "block";
+      }
+    }
+
+    // Carregar reservas
+    const tabela = document.getElementById('tabela-corpo');
+    db.doc("rifa/numeros").onSnapshot((docSnap) => {
+      tabela.innerHTML = "";
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        Object.keys(data).forEach(numero => {
+          const info = data[numero];
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${numero}</td>
+            <td>${info.nome || ""}</td>
+            <td>${info.whatsapp || ""}</td>
+            <td>${info.status || ""}</td>
+            <td>${info.timestamp ? new Date(info.timestamp).toLocaleString() : ""}</td>
+            <td>
+              <button class="pago-btn" onclick="marcarPago('${numero}')">Pago</button>
+              <button class="cancelar-btn" onclick="cancelarReserva('${numero}')">Cancelar</button>
+            </td>
+          `;
+          tabela.appendChild(tr);
+        });
+      }
+    });
+
+    // Marcar como pago
+    function marcarPago(numero) {
+      const ref = db.doc("rifa/numeros");
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data[numero]) {
+            data[numero].status = "vendido";
+            ref.set(data);
+          }
+        }
+      });
+    }
+
+    // Cancelar reserva
+    function cancelarReserva(numero) {
+      const ref = db.doc("rifa/numeros");
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          delete data[numero];
+          ref.set(data);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

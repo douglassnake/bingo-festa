@@ -1,0 +1,121 @@
+
+html, body {
+  overscroll-behavior-x: contain;
+}
+
+/* ======== WRAPPER DA GRADE ======== */
+.grid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+
+/* ======== GRADE DE NÚMEROS ======== */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 850px; /* garante rolagem horizontal real */
+  padding: 10px 0;
+}
+
+/* ======== ESTILO DOS NÚMEROS ======== */
+.numero {
+  background-color: #e0e0e0;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  min-width: 60px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.numero:hover {
+  background-color: #cfcfcf;
+}
+
+.numero.disponivel {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.numero.reservado {
+  background-color: #FFC107;
+  color: #000;
+}
+
+.numero.vendido {
+  background-color: #F44336;
+  color: white;
+}
+
+/* ======== MODAL ======== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 10px;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.modal-actions button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background-color: #ccc;
+}
+
+.modal-actions button:last-child {
+  background-color: #4CAF50;
+  color: white;
+}
